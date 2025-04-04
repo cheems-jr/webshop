@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Our Products</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <header>
+        <h1>Our Products</h1>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/products">Products</a>
+        </nav>
+    </header>
+    
+    <main>
+        <div class="product-grid">
+            {% for product in products %}
+            <div class="product-card">
+                <h3>{{ product.name }}</h3>
+                <p>${{ "%.2f"|format(product.price) }}</p>
+                <a href="/product/{{ product.id }}">View Details</a>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 My Webshop</p>
+    </footer>
+</body>
+</html>
