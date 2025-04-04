@@ -16,6 +16,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
+
+
 class Product(db.Model):
     __tablename__ = 'products'
 
@@ -42,26 +44,20 @@ class Category(db.Model):
 
 @app.route('/')
 def homepage():
-    return render_template('index.html', featured_products = products[:2])
+    featured = Product.query.order_by(db.func.random()).limit(3).all()
+    return render_template('index.html', featured_products = featured)
 
-
-products = [
-    {"id" : 1, 'name' : 'python t-shirt', 'price' : 24.99},
-    {"id" : 2, 'name' : 'flosk mug', 'price' : 19.99},
-    {'id' : 3, 'name' : 'chinese treats', 'price' : 2.99}
-]
 
 @app.route('/products')
 def product_list():
+    products = Product.query.all()
     return render_template('products.html', products = products)
 
 
 @app.route('/product/<int:product_id>')
 def product_detail(product_id):
-    product = next((p for p in products if p['id'] == product_id), None)
-    if product:
-        return render_template('product_detail.html', product = product)
-    return 'Product not found', 404
+    product = Product.query.get_or_404(product_id)
+    return render_template('product_detail.html', product = product)
 
 
 if __name__ == '__main__':
