@@ -1,0 +1,20 @@
+# Environment files
+.env            # Default environment file
+.env.local      # Local overrides
+.env.development
+.env.production
+.env.test
+
+# Sensitive files
+secrets.json
+*.key
+*.pem
+
+# IDE/Editor files (optional)
+.idea/
+.vscode/
+*.swp
+
+# OS files (optional)
+.DS_Store
+Thumbs.db

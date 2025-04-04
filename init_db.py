@@ -11,7 +11,7 @@ with app.app_context():
         db.session.add_all([
             electronics,
             clothing,
-            Product(name = 'Wireless Headphones', price = 299, category = electronics),
+            Product(name = 'Wireless Headphones', price = 299.99, category = electronics),
             Product(name = 'Tshirt', price = 19.99, category = clothing),
         ])
         db.session.commit()
