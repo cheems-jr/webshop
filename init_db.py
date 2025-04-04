@@ -2,6 +2,7 @@ from app import app, db
 from app import Category, Product
 
 with app.app_context():
+    db.drop_all()
     db.create_all()
 
     if not Category.query.first():
