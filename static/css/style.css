@@ -73,3 +73,30 @@ footer {
 .view-all:hover {
     text-decoration: underline;
 }
+
+.product-detail {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 1rem;
+}
+
+.product-detail img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 1rem 0;
+}
+
+.product-detail .price {
+    font-size: 1.5rem;
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+form button {
+    background: #2c3e50;
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    cursor: pointer;
+}
