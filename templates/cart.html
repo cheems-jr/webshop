@@ -14,9 +14,10 @@
     </header>
     
     <main>
+        {% block content %}
         <h2>Your Shopping Cart</h2>
 
-        {% if not cart_items %}
+        {% if not items %}
         <p>Your cart is empty</p>
         {% else %}
         <table class="cart-table">
@@ -30,10 +31,10 @@
                 </tr>
             </thead>
             <tbody>
-                {% for item in cart_items %}
+                {% for item in items %}
                 <tr>
-                    <td>{{ item.product.name }}</td>
-                    <td>${{ "%.2f"|format(item.product.price) }}</td>
+                    <td>{{ item.item.name }}</td>
+                    <td>${{ "%.2f"|format(item.item.price) }}</td>
                     <td>
                         <form action="/update_cart/{{ item.id }}" method="post">
                             <input type="number" name="quantity" 
@@ -41,7 +42,7 @@
                             <button type="submit">Update</button>
                         </form>
                     </td>
-                    <td>${{ "%.2f"|format(item.product.price * item.quantity) }}</td>
+                    <td>${{ "%.2f"|format(item.item.price * item.quantity) }}</td>
                     <td>
                         <a href="/remove_from_cart/{{ item.id }}" 
                         class="remove-btn">Remove</a>
