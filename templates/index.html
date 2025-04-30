@@ -10,6 +10,12 @@
         <nav>
             <a href="/">Home</a>
             <a href="/products">Products</a>
+            <a href="/cart" class="cart-link">
+                Cart 
+                {% if cart_count > 0 %}
+                <span class="cart-count">({{ cart_count }})</span>
+                {% endif %}
+            </a>
         </nav>
     </header>
     
