@@ -1,7 +1,9 @@
-from flask import Flask, render_template # type: ignore
+from flask import Flask, render_template, redirect, request, session # type: ignore
 from flask_sqlalchemy import SQLAlchemy # type: ignore
 from dotenv import load_dotenv # type: ignore
 import os
+from datetime import datetime, timezone
+import uuid
 
 load_dotenv()
 
@@ -39,7 +41,73 @@ class Category(db.Model):
 
     products = db.relationship('Product', back_populates='category')
 
+class Cart(db.Model):
+    __tablename__ = 'carts'
 
+    id = db.Column(db.Integer, primary_key = True)
+    user_session = db.Column(db.String(100), )
+    created_at = db.Column(db.DateTime, default = datetime.now(timezone.utc))
+
+    cart_item = db.relationship('CartItem', back_populates='cart', cascade='all, delete-orphan')
+
+class CartItem(db.Model):
+    __tablename__ = 'cart_items'
+
+    id = db.Column(db.Integer, primary_key = True)
+    cart_id = db.Column(db.Integer, db.ForeignKey('cart.id', nullable=False))
+    item_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable = False)
+    quantity = db.Column(db.Integer, default=1)
+
+    item = db.relationship('Product')
+    cart = db.relationship('Cart', back_populates='cart_items')
+
+    
+
+def cart_create_or_get():
+    if 'cart_id' not in session:
+        cart = Cart(user_session = str(uuid.uuid4()))
+        db.session.add(cart)
+        db.session.commit()
+        session['cart_id'] = cart.id
+    return Cart.query.get(session['cart_id'])
+
+def cart_get_items():
+    cart = cart_create_or_get()
+    return cart.cart_item()
+
+def cart_add_item(product_id, item_quantity):
+    cart = cart_create_or_get()
+    existing_item = next((item for item in cart.cart_item if item.id == product_id), None)
+
+    if existing_item:
+        existing_item.quantity += item_quantity
+    else:
+        new_item = CartItem(
+            cart_id = cart.cart_item,
+            item_id = product_id,
+            quantity = item_quantity
+        )
+
+
+@app.route('/add_to_cart', methods = ['POST'])
+def add_to_cart_route():
+    product_id = request.form.get('product_id')
+    quantity = int(request.form.get('quantity', 1))
+    cart_add_item(product_id, quantity)
+    return redirect(request.refferer or '/')
+
+@app.route('/cart')
+def cart_get_items_route():
+    items = cart_get_items()
+    total = sum(item.product.price * item.quantity for item in items)
+    return render_template('cart.html', items, total)
+
+@app.route('/remove_from_cart/<int:item_id>')
+def remove_from_cart(item_id):
+    item = CartItem.query.get_or_404(item_id)
+    db.session.delete(item)
+    db.session.commit()
+    return redirect('/cart')
 
 
 @app.route('/')
