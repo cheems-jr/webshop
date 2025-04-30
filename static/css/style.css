@@ -100,3 +100,42 @@ form button {
     border: none;
     cursor: pointer;
 }
+
+.cart-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+}
+
+.cart-table th, .cart-table td {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.cart-table th {
+    background-color: #f4f4f4;
+}
+
+.remove-btn {
+    color: #e74c3c;
+    text-decoration: none;
+}
+
+.remove-btn:hover {
+    text-decoration: underline;
+}
+
+.checkout-btn {
+    display: inline-block;
+    background: #2ecc71;
+    color: white;
+    padding: 0.5rem 1rem;
+    margin-top: 1rem;
+    text-decoration: none;
+    border-radius: 4px;
+}
+
+.checkout-btn:hover {
+    background: #27ae60;
+}
