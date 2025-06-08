@@ -112,6 +112,16 @@ def remove_from_cart(item_id):
     db.session.commit()
     return redirect('/cart')
 
+@app.route('/update_cart/<int:item_id>', methods = ['POST'])
+def update_cart(item_id):
+    items = cart_get_items()
+    current_item = next((item for item in items if  item.id == item_id), None)
+    cart_add_item(item_id, -current_item.quantity)
+
+    cart_add_item(item_id, int(request.form.get('quantity')))
+
+    return redirect('/cart')
+
 
 @app.route('/')
 def homepage():
