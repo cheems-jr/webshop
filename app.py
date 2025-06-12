@@ -78,7 +78,7 @@ def cart_get_items():
 
 def cart_add_item(product_id, item_quantity):
     cart = cart_create_or_get()
-    existing_item = next((item for item in cart.cart_items if item.id == product_id), None)
+    existing_item = next((item for item in cart.cart_items if item.item.id == product_id), None)
 
     if existing_item:
         existing_item.quantity += item_quantity
@@ -103,8 +103,10 @@ def cart_summary():
 
 @app.route('/add_to_cart', methods = ['POST'])
 def add_to_cart_ajax():
+    
     if request.is_json:
         data = request.json
+        print(f"Received add_to_cart request for product {data['product_id']}")  # Debug log
         product_id = int(data['product_id'])
         quantity = int(data.get('quantity', 1))
 
@@ -137,7 +139,6 @@ def remove_cart_item():
 
     if item:
         cart = item.cart
-        print(cart)
         db.session.delete(item)
         db.session.commit()
 
@@ -157,12 +158,15 @@ def update_cart_item():
     if item:
         item.quantity = int(data['quantity'])
         db.session.commit()
+        cart = item.cart
+        cart_count = sum(i.quantity for i in cart.cart_items)
 
         return jsonify({
             'status': 'success',
             'new_total': item.item.price * item.quantity,
             'grand_total': sum(i.item.price * i.quantity for i in item.cart.cart_items),
             'cart_item_id': item.id,
+            'cart_count': cart_count
         })
 
     return jsonify({'status': 'error', 'message': 'invalid_request'}), 400
