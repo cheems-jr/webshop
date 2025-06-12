@@ -125,7 +125,8 @@ def add_to_cart_ajax():
 
 @app.route('/cart')
 def cart_get_items_route():
-    items = cart_get_items()
+    cart = cart_create_or_get()
+    items = CartItem.query.filter_by(cart_id=cart.id).order_by(CartItem.id.asc()).all()
     total = sum(item.item.price * item.quantity for item in items)
     return render_template('cart.html', items = items, total = total)
 
@@ -133,7 +134,6 @@ def cart_get_items_route():
 def remove_cart_item():
     data = request.get_json()
     item = CartItem.query.get(data['item_id'])
-    print(f'chugga chugga {item}')
 
     if item:
         cart = item.cart
@@ -155,14 +155,14 @@ def update_cart_item():
     item = CartItem.query.get(data['item_id'])
     
     if item:
-        item.quantity = data['quantity']
+        item.quantity = int(data['quantity'])
         db.session.commit()
 
         return jsonify({
             'status': 'success',
             'new_total': item.item.price * item.quantity,
             'grand_total': sum(i.item.price * i.quantity for i in item.cart.cart_items),
-
+            'cart_item_id': item.id,
         })
 
     return jsonify({'status': 'error', 'message': 'invalid_request'}), 400
