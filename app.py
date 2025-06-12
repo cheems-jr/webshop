@@ -158,12 +158,15 @@ def update_cart_item():
     if item:
         item.quantity = int(data['quantity'])
         db.session.commit()
+        cart = item.cart
+        cart_count = sum(i.quantity for i in cart.cart_items)
 
         return jsonify({
             'status': 'success',
             'new_total': item.item.price * item.quantity,
             'grand_total': sum(i.item.price * i.quantity for i in item.cart.cart_items),
             'cart_item_id': item.id,
+            'cart_count': cart_count
         })
 
     return jsonify({'status': 'error', 'message': 'invalid_request'}), 400
