@@ -78,7 +78,7 @@ def cart_get_items():
 
 def cart_add_item(product_id, item_quantity):
     cart = cart_create_or_get()
-    existing_item = next((item for item in cart.cart_items if item.id == product_id), None)
+    existing_item = next((item for item in cart.cart_items if item.item.id == product_id), None)
 
     if existing_item:
         existing_item.quantity += item_quantity
