@@ -53,7 +53,15 @@ function updateCartDisplay(){
 }
 
 async function updateCartItem(itemId, newQuantity){
+    input = document.querySelector(`.cart-quantity[data-item-id="${itemId}"]`);
+    originalQuantity = input.dataset.originalQuantity;
+
     try {
+        if (isNaN(newQuantity) || newQuantity < 1 || newQuantity > parseInt(input.max)) {
+            input.value = originalQuantity;
+            throw new Error('Invalid Quantity');
+        }
+
         const response = await fetch('/update_cart_item', {
             method: 'POST',
             headers: {
@@ -71,6 +79,8 @@ async function updateCartItem(itemId, newQuantity){
             const totalElement = document.querySelector(`[data-item-id="${itemId}"] .item-total`);
             const row = document.querySelector(`[data-item-id="${itemId}"]`);
 
+            input.dataset.originalQuantity = newQuantity;
+
             if (totalElement) {
                 totalElement.textContent = `$${data.new_total.toFixed(2)}`;
             }
@@ -81,8 +91,12 @@ async function updateCartItem(itemId, newQuantity){
 
             row.classList.add('updated');
             setTimeout(() => row.classList.remove('updated'), 500);
+        } else {
+            input.value = originalQuantity;
+            throw new Error(data.message || 'Update failed')
         }
     } catch (error) {
+        input.value = originalQuantity;
         console.error('Error updating cart:', error)
     }
 }

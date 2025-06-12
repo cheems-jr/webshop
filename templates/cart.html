@@ -28,7 +28,10 @@
                                class="cart-quantity"
                                value="{{ item.quantity }}" 
                                min="1"
-                               data-item-id="{{ item.id }}">
+                               max="{{ item.item.stock }}"
+                               data-item-id="{{ item.id }}"
+                               data-original-quantity="{{ item.quantity }}">
+
                     </td>
                     <td class="item-total">
                         ${{ "%.2f"|format(item.item.price * item.quantity) }}
