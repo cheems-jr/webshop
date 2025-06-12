@@ -1,19 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>My Python Webshop</title>
-    <link rel="stylesheet" href="/static/css/style.css">
-</head>
-<body>
-    <header>
-        <h1>Welcome to Our Shop</h1>
-        <nav>
-            <a href="/">Home</a>
-            <a href="/products">Products</a>
-        </nav>
-    </header>
-    
-    <main>
+{% extends "base.html" %}
+
+{% block title %}Our Products{% endblock %}
+
+{% block content %}
         <div class="product-detail">
             <h2>{{ product.name }}</h2>
             <img src="{{ product.image_url or '/static/images/placeholder.png' }}" 
@@ -22,18 +11,14 @@
             <p>{{ product.description }}</p>
             <p>In stock: {{ product.stock }}</p>
             
-            <form action="/add_to_cart" method="post">
+            <form id="add-to-cart-form">
                 <input type="hidden" name="product_id" value="{{ product.id }}">
                 <label for="quantity">Quantity:</label>
                 <input type="number" name="quantity" value="1" min="1" 
                        max="{{ product.stock }}">
-                <button type="submit">Add to Cart</button>
+                <button type="button" id="add-to-cart-button">Add to Cart</button>
             </form>
-        </div>
-    </main>
 
-    <footer>
-        <p>&copy; 2023 My Webshop</p>
-    </footer>
-</body>
-</html>
+            <div id="cart-message" style="display: none;"></div>
+        </div>
+{% endblock %}

@@ -1,47 +1,24 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>My Python Webshop</title>
-    <link rel="stylesheet" href="/static/css/style.css">
-</head>
-<body>
-    <header>
-        <h1>Welcome to Our Shop</h1>
-        <nav>
-            <a href="/">Home</a>
-            <a href="/products">Products</a>
-            <a href="/cart" class="cart-link">
-                Cart 
-                {% if cart_count > 0 %}
-                <span class="cart-count">({{ cart_count }})</span>
-                {% endif %}
-            </a>
-        </nav>
-    </header>
-    
-    <main>
-        <section class="hero">
-            <h2>Quality Products</h2>
-            <p>Discover our amazing collection</p>
-        </section>
-        <!-- Add this inside your <main> section -->
-        <section class="featured">
-            <h2>Featured Products</h2>
-            <div class="product-grid">
-                {% for product in featured_products %}
-                <div class="product-card">
-                    <h3>{{ product.name }}</h3>
-                    <p>${{ "%.2f"|format(product.price) }}</p>
-                    <a href="/product/{{ product.id }}">View Details</a>
-                </div>
-                {% endfor %}
-            </div>
-            <a href="/products" class="view-all">View All Products →</a>
-        </section>
-    </main>
+{% extends "base.html" %}
 
-    <footer>
-        <p>&copy; 2023 My Webshop</p>
-    </footer>
-</body>
-</html>
+{% block title %}Home - My Webshop{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <h2>Quality Products</h2>
+    <p>Discover our amazing collection</p>
+</section>
+<!-- Add this inside your <main> section -->
+<section class="featured">
+    <h2>Featured Products</h2>
+    <div class="product-grid">
+        {% for product in featured_products %}
+        <div class="product-card">
+            <h3>{{ product.name }}</h3>
+            <p>${{ "%.2f"|format(product.price) }}</p>
+            <a href="/product/{{ product.id }}">View Details</a>
+        </div>
+        {% endfor %}
+    </div>
+    <a href="/products" class="view-all">View All Products →</a>
+</section>
+{% endblock %}
