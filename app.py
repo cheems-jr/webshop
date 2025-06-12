@@ -1,6 +1,6 @@
-from flask import Flask, render_template, redirect, request, session # type: ignore
-from flask_sqlalchemy import SQLAlchemy # type: ignore
-from dotenv import load_dotenv # type: ignore
+from flask import Flask, render_template, redirect, request, session, jsonify
+from flask_sqlalchemy import SQLAlchemy 
+from dotenv import load_dotenv 
 import os
 from datetime import datetime, timezone
 import uuid
@@ -90,14 +90,38 @@ def cart_add_item(product_id, item_quantity):
         )
         db.session.add(new_item)
     db.session.commit()
+    return cart
+
+@app.route('/cart_summary')
+def cart_summary():
+    cart_items = cart_get_items()
+    return jsonify({
+        'cart_count': sum(item.quantity for item in cart_items),
+        'subtotal': sum(item.quantity * item.item.price for item in cart_items)
+    })
 
 
 @app.route('/add_to_cart', methods = ['POST'])
-def add_to_cart_route():
-    product_id = request.form.get('product_id')
-    quantity = int(request.form.get('quantity', 1))
-    cart_add_item(product_id, quantity)
-    return redirect(request.referrer or '/')
+def add_to_cart_ajax():
+    if request.is_json:
+        data = request.json
+        product_id = int(data['product_id'])
+        quantity = int(data.get('quantity', 1))
+
+        try:
+            cart = cart_add_item(product_id, quantity)
+
+            return jsonify({
+                'status': 'success',
+                'cart_count': sum(item.quantity for item in cart.cart_items),
+            })
+            
+        except Exception as e:
+            return jsonify({
+                'status': 'error',
+                'message': str(e)
+            }), 400
+    return jsonify({'status': 'error', 'message': 'Invalid request'}), 400
 
 @app.route('/cart')
 def cart_get_items_route():
@@ -105,22 +129,43 @@ def cart_get_items_route():
     total = sum(item.item.price * item.quantity for item in items)
     return render_template('cart.html', items = items, total = total)
 
-@app.route('/remove_from_cart/<int:item_id>')
-def remove_from_cart(item_id):
-    item = CartItem.query.get_or_404(item_id)
-    db.session.delete(item)
-    db.session.commit()
-    return redirect('/cart')
+@app.route('/remove_cart_item', methods = ['POST'])
+def remove_cart_item():
+    data = request.get_json()
+    item = CartItem.query.get(data['item_id'])
+    print(f'chugga chugga {item}')
 
-@app.route('/update_cart/<int:item_id>', methods = ['POST'])
-def update_cart(item_id):
-    items = cart_get_items()
-    current_item = next((item for item in items if  item.id == item_id), None)
-    cart_add_item(item_id, -current_item.quantity)
+    if item:
+        cart = item.cart
+        print(cart)
+        db.session.delete(item)
+        db.session.commit()
 
-    cart_add_item(item_id, int(request.form.get('quantity')))
+        return jsonify({
+            'status': 'success',
+            'grand_total': sum(i.item.price * i.quantity for i in cart.cart_items),
+            'is_cart_empty': len(cart.cart_items) == 0 
+        })
 
-    return redirect('/cart')
+    return jsonify({'status': 'error', 'message': 'Invalid Request'}), 400
+
+@app.route('/update_cart_item', methods = ['POST'])
+def update_cart_item():
+    data = request.get_json()
+    item = CartItem.query.get(data['item_id'])
+    
+    if item:
+        item.quantity = data['quantity']
+        db.session.commit()
+
+        return jsonify({
+            'status': 'success',
+            'new_total': item.item.price * item.quantity,
+            'grand_total': sum(i.item.price * i.quantity for i in item.cart.cart_items),
+
+        })
+
+    return jsonify({'status': 'error', 'message': 'invalid_request'}), 400
 
 
 @app.route('/')
@@ -140,12 +185,20 @@ def product_detail(product_id):
     product = Product.query.get_or_404(product_id)
     return render_template('product_detail.html', product = product)
 
+
+
+
+
 @app.context_processor
 def inject_cart_count():
     if 'cart_id' in session:
         cart = Cart.query.get(session['cart_id'])
         return {'cart_count': len(cart.cart_items) if cart else 0}
     return {'cart_count': 0}
+
+@app.context_processor
+def inject_now():
+    return {'now': datetime.now()}
 
 if __name__ == '__main__':
     app.run(debug=True)

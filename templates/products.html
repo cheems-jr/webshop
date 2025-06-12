@@ -1,19 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Our Products</title>
-    <link rel="stylesheet" href="/static/css/style.css">
-</head>
-<body>
-    <header>
-        <h1>Our Products</h1>
-        <nav>
-            <a href="/">Home</a>
-            <a href="/products">Products</a>
-        </nav>
-    </header>
-    
-    <main>
+{% extends "base.html" %}
+
+{% block title %}Our Products{% endblock %}
+
+{% block content %}
         <div class="product-grid">
             {% for product in products %}
             <div class="product-card">
@@ -23,10 +12,4 @@
             </div>
             {% endfor %}
         </div>
-    </main>
-
-    <footer>
-        <p>&copy; 2023 My Webshop</p>
-    </footer>
-</body>
-</html>
+{% endblock %}
