@@ -103,8 +103,10 @@ def cart_summary():
 
 @app.route('/add_to_cart', methods = ['POST'])
 def add_to_cart_ajax():
+    
     if request.is_json:
         data = request.json
+        print(f"Received add_to_cart request for product {data['product_id']}")  # Debug log
         product_id = int(data['product_id'])
         quantity = int(data.get('quantity', 1))
 
@@ -137,7 +139,6 @@ def remove_cart_item():
 
     if item:
         cart = item.cart
-        print(cart)
         db.session.delete(item)
         db.session.commit()
 
